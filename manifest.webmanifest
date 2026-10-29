@@ -1,0 +1,19 @@
+{
+  "name": "mise. | A little cookbook",
+  "short_name": "mise.",
+  "description": "Big cravings, everyday ingredients, a little kitchen confidence.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f3ee",
+  "theme_color": "#f5f3ee",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
