@@ -1,0 +1,87 @@
+name: Android APK
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Prepare Capacitor project
+        run: |
+          mkdir -p www
+          cp index.html www/index.html
+          cp manifest.webmanifest www/manifest.webmanifest
+          cp icon.svg www/icon.svg
+          cat > package.json <<'EOF'
+          {
+            "name": "mise-cookbook",
+            "version": "1.0.0",
+            "private": true,
+            "description": "mise. cookbook Android wrapper",
+            "dependencies": {
+              "@capacitor/android": "latest",
+              "@capacitor/cli": "latest",
+              "@capacitor/core": "latest"
+            }
+          }
+          EOF
+          cat > capacitor.config.json <<'EOF'
+          {
+            "appId": "com.vaspyyy.opencb",
+            "appName": "mise.",
+            "webDir": "www",
+            "bundledWebRuntime": false,
+            "server": {
+              "androidScheme": "https"
+            }
+          }
+          EOF
+          npm install
+          npx cap add android
+          npx cap sync android
+
+      - name: Build debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          mkdir -p ../dist
+          cp app/build/outputs/apk/debug/app-debug.apk ../dist/mise-${GITHUB_REF_NAME#v}.apk
+
+      - name: Upload APK as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mise-android-apk
+          path: dist/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish tagged GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          name: mise. ${{ github.ref_name }}
+          generate_release_notes: true
+          files: dist/*.apk
