@@ -38,3 +38,17 @@ In the repository settings, open **Pages**, choose **Deploy from a branch**, sel
 ## Notes
 
 Saved recipes and theme preference stay in the current browser via local storage. The UI uses the Material Symbols font and web fonts when online; the core app works without them. Recipe costs are broad ingredient-use estimates, not live supermarket prices.
+
+
+## Android APK
+
+The Android app is packaged with Capacitor by GitHub Actions. Push a version tag such as `v1.0.0`; the workflow builds a debug APK and attaches it to a GitHub Release. A manually started workflow also uploads the APK as a 30-day workflow artifact.
+
+Install the APK on your Android phone by downloading it, opening it, and allowing your browser or file manager to install apps from that source if Android asks. This is an unsigned debug build, so Android may show a warning. It is not published through Google Play.
+
+To create a release tag from a local clone:
+
+```sh
+git tag v1.0.0
+git push origin v1.0.0
+```
